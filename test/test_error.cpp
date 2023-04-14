@@ -1,8 +1,11 @@
 #include <iostream>
 #include <string>
+#include "../src/Document.hpp"
+
 int main() {
-    const char * st = "hello";
-    std::string str(st, 5);
-    std::cout << str;
+    cppjson::Document doc;
+    doc.parse("\"\\u0000\"");
+    auto res = doc.getString();
+    std::cout << res.size();
     return 0;
 }

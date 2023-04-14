@@ -42,6 +42,13 @@
     EXPECT_EQ(doc.getInt64(), num); \
 } while(false)
 
+#define TEST_STRING(str, json) do { \
+    cppjson::Document doc; \
+    cppjson::ParseError err = doc.parse(json); \
+    EXPECT_EQ(err, cppjson::PARSE_OK); \
+    EXPECT_EQ(doc.getType(), cppjson::TYPE_STRING); \
+    EXPECT_EQ(doc.getString(), str); \
+} while(false)
 
 TEST(json_value, null) {
     TEST_NULL("null");
@@ -104,6 +111,23 @@ TEST(json_value, number) {
     TEST_INT64(-1, "-1i64");
     TEST_INT64(2147483647, "2147483647i64");
     TEST_INT64(-2147483648, "-2147483648i64");
+}
+
+TEST(json_value, string_)
+{
+    TEST_STRING("", "\"\"");
+    TEST_STRING("abcd", "\"abcd\"");
+    TEST_STRING("\\", "\"\\\\\"");
+    TEST_STRING("\"", "\"\\\"\"");
+    TEST_STRING("/\b\f\n\r\t", "\"\\/\\b\\f\\n\\r\\t\"");
+    TEST_STRING(std::string("蛤\0蛤\0蛤", 11), "\"蛤\\u0000蛤\\u0000蛤\"");
+    // TEST_STRING("蛤\0蛤\0蛤", "\"蛤\0蛤\0蛤\"");
+    TEST_STRING(std::string("\0", 1), "\"\\u0000\"");
+    TEST_STRING("\x24", "\"\\u0024\"");         			/* Dollar $ */
+    TEST_STRING("\xC2\xA2", "\"\\u00A2\"");     			/* Cents ¢ */
+    TEST_STRING("\xE2\x82\xAC", "\"\\u20AC\""); 			/* Euro € */
+    TEST_STRING("\xF0\x9D\x84\x9E", "\"\\uD834\\uDD1E\""); /* G clef  𝄞 */
+    TEST_STRING("\xF0\x9D\x84\x9E", "\"\\ud834\\udd1e\""); /* G clef  𝄞 */
 }
 
 int main(int argc, char **argv) {

@@ -3,8 +3,8 @@
 
 int main() {
     cppjson::Document doc;
-    auto i = doc.parse("123242");
+    auto i = doc.parse("\"\"");
     std::cout << i << std::endl;
-    std::cout << doc.getInt32();
+    std::cout << doc.getString();
     return 0;
 }

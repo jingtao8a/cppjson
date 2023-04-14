@@ -52,7 +52,7 @@ private:
             case 'n': return parseLiteral(is, handler, "null", TYPE_NULL);
             case 't': return parseLiteral(is, handler, "true", TYPE_BOOL);
             case 'f': return parseLiteral(is, handler, "false", TYPE_BOOL);
-            // case '\"': return parseString(is, handler, false);
+            case '\"': return parseString(is, handler, false);
             // case '[': return parseArray(is, handler);
             // case '{': return parseObject(is, handler);
             default:  return parseNumber(is, handler);
@@ -207,13 +207,82 @@ private:
             throw Exception(PARSE_NUMBER_TOO_BIG);
         }
     }
+
+    template <typename ReadStream, typename Handler>
+    static void parseString(ReadStream& is, Handler& handler, bool isKey) {
+        is.assertNext('\"');
+        std::string buffer;
+        while (is.hasNext()) {
+            switch (char ch = is.next()) {
+                case '"':
+                    if (isKey) {
+                        // CALL(handler.Key(std::move(buffer)));
+                    }
+                    else {
+                        CALL(handler.String(std::move(buffer)));
+                    }
+                    return;
+                case '\x01'...'\x1f'://小于0x20
+                    throw Exception(PARSE_BAD_STRING_CHAR);
+                case '\\'://转义符
+                    switch (is.next()) {
+                        case '"':  buffer.push_back('"');  break;
+                        case '\\': buffer.push_back('\\'); break;
+                        case '/':  buffer.push_back('/');  break;
+                        case 'b':  buffer.push_back('\b'); break;
+                        case 'f':  buffer.push_back('\f'); break;
+                        case 'n':  buffer.push_back('\n'); break;
+                        case 'r':  buffer.push_back('\r'); break;
+                        case 't':  buffer.push_back('\t'); break;
+                        case 'u': {
+                            // unicode stuff from Milo's tutorial
+                            unsigned u = parseHex4(is);
+                            if (u >= 0xD800 && u <= 0xDBFF) {
+                                if (is.next() != '\\')
+                                    throw Exception(PARSE_BAD_UNICODE_SURROGATE);
+                                if (is.next() != 'u')
+                                    throw Exception(PARSE_BAD_UNICODE_SURROGATE);
+                                unsigned u2 = parseHex4(is);
+                                if (u2 >= 0xDC00 && u2 <= 0xDFFF)
+                                    u = 0x10000 + (u - 0xD800) * 0x400 + (u2 - 0xDC00);
+                                else
+                                    throw Exception(PARSE_BAD_UNICODE_SURROGATE);
+                            }
+                            encodeUtf8(buffer, u);
+                            break;
+                        }
+                        default: throw Exception(PARSE_BAD_STRING_ESCAPE);
+                    }
+                    break;
+                default: buffer.push_back(ch);//普通字符
+            }
+        }
+        throw Exception(PARSE_MISS_QUOTATION_MARK);
+    }
+
 #undef CALL
 
 
 private:
     static bool isDigit(char ch) { return ch >= '0' && ch <= '9'; }
     static bool isDigit19(char ch) { return ch >= '1' && ch <= '9'; }
-    // static void encodeUtf8(std::string& buffer, unsigned u);
+    static void encodeUtf8(std::string& buffer, unsigned u);
+    template <typename ReadStream>
+    static unsigned parseHex4(ReadStream& is) {
+        // unicode stuff from Milo's tutorial
+        unsigned u = 0;
+        for (int i = 0; i < 4; i++) {
+            u <<= 4;
+            switch (char ch = is.next()) {
+                case '0'...'9': u |= ch - '0'; break;
+                case 'a'...'f': u |= ch - 'a' + 10; break;
+                case 'A'...'F': u |= ch - 'A' + 10; break;
+                default: throw Exception(PARSE_BAD_UNICODE_HEX);
+            }
+        }
+        return u;
+    }
+    
 };
 
 }

@@ -51,6 +51,11 @@ public:
         return true;
     }
 
+    bool String(std::string s) {
+        addValue(Value(s));
+        return true;
+    }
+
 private:
     Value* addValue(Value&& value) {
         ValueType type = value.getType();
