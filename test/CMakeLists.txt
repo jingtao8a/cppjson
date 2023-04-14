@@ -14,11 +14,15 @@ foreach(_source ${GOOGLETEST_SOURCES})
     set_source_files_properties(${_source} PROPERTIES GENERATED 1)
 endforeach()
 
-add_library(gtest ${GOOGLETEST_SOURCES})
+add_library(gtest STATIC ${GOOGLETEST_SOURCES})
 target_link_libraries(gtest pthread)
 
 add_executable(test_error test_error.cpp)
-target_link_libraries(test_error gtest)
+target_link_libraries(test_error gtest cppjson)
+
+add_executable(test_value test_value.cpp)
+target_link_libraries(test_value gtest cppjson)
 
 set(TEST_DIR ${EXECUTABLE_OUTPUT_PATH})
 add_test(test_error ${TEST_DIR}/test_error)
+add_test(test_value ${TEST_DIR}/test_value)
