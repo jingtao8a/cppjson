@@ -53,8 +53,8 @@ private:
             case 't': return parseLiteral(is, handler, "true", TYPE_BOOL);
             case 'f': return parseLiteral(is, handler, "false", TYPE_BOOL);
             case '\"': return parseString(is, handler, false);
-            // case '[': return parseArray(is, handler);
-            // case '{': return parseObject(is, handler);
+            case '[': return parseArray(is, handler);
+            case '{': return parseObject(is, handler);
             default:  return parseNumber(is, handler);
         }
     }
@@ -216,7 +216,7 @@ private:
             switch (char ch = is.next()) {
                 case '"':
                     if (isKey) {
-                        // CALL(handler.Key(std::move(buffer)));
+                        CALL(handler.Key(std::move(buffer)));
                     }
                     else {
                         CALL(handler.String(std::move(buffer)));
@@ -260,6 +260,74 @@ private:
         throw Exception(PARSE_MISS_QUOTATION_MARK);
     }
 
+    template <typename ReadStream, typename Handler>
+    static void parseArray(ReadStream& is, Handler& handler) {
+        CALL(handler.StartArray());
+        
+        is.assertNext('[');
+        parseWhiteSpace(is);
+
+        if (is.peek() == ']') {
+            is.next();
+            CALL(handler.EndArray());
+            return;
+        }
+
+        while (true) {
+            parseValue(is, handler);
+            parseWhiteSpace(is);
+            switch (is.next()) {
+                case ',':
+                    parseWhiteSpace(is);
+                    break;
+                case ']':
+                    CALL(handler.EndArray());
+                    return;
+                default:
+                    throw Exception(PARSE_MISS_COMMA_OR_SQUARE_BRACKET);
+            }
+        }
+    }
+
+    template <typename ReadStream, typename Handler>
+    static void parseObject(ReadStream& is, Handler& handler) {
+        CALL(handler.StartObject());
+        is.assertNext('{');
+        parseWhiteSpace(is);
+        if (is.peek() == '}') {
+            is.next();
+            CALL(handler.EndObject());
+            return;
+        }
+
+        while (true) {
+            if (is.peek() != '"') {
+                throw Exception(PARSE_MISS_KEY);
+            }
+            parseString(is, handler, true);//解析key值
+
+            // parse ':'
+            parseWhiteSpace(is);
+            if (is.next() != ':') {
+                throw Exception(PARSE_MISS_COLON);
+            }
+            parseWhiteSpace(is);
+
+            // go on
+            parseValue(is, handler);
+            parseWhiteSpace(is);
+            switch (is.next()) {
+                case ',':
+                    parseWhiteSpace(is);
+                    break;
+                case '}':
+                    CALL(handler.EndObject());
+                    return;
+                default:
+                    throw Exception(PARSE_MISS_COMMA_OR_CURLY_BRACKET);
+            }
+        }
+    }
 #undef CALL
 
 

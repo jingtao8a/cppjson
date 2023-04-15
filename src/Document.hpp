@@ -3,6 +3,7 @@
 
 #include "Value.hpp"
 #include "Reader.hpp"
+#include "Exception.hpp"
 #include <cassert>
 #include <string>
 
@@ -24,8 +25,6 @@ public:
         return Reader::parse(is, *this);
     }
 public:
-    Document():m_seeValue(false) {}
-    
     bool Null() {
         addValue(Value(TYPE_NULL));
         return true;
@@ -56,31 +55,39 @@ public:
         return true;
     }
 
-private:
-    Value* addValue(Value&& value) {
-        ValueType type = value.getType();
-        if (m_seeValue) {
-            assert(!m_stack.empty() && "root not singular");
-        } else {
-            assert(m_type == TYPE_NULL);
-            m_seeValue = true;
-            m_type = value.m_type;
-            m_i64 = value.m_i64;
-            value.m_type = TYPE_NULL;
-            value.m_i64 = 0;
-            return this;
-        }
-        return nullptr;
+    bool StartArray() {
+        addValue(Value(TYPE_ARRAY));
+        return true;
+    }
+
+    bool EndArray() {
+        assert(!m_stack.empty());
+        assert(m_stack.back()->m_type == TYPE_ARRAY);
+        m_stack.pop_back();
+        return true;
+    }
+
+    bool Key(std::string s) {
+        m_key = std::move(Value(s));
+        return true;
+    }
+
+    bool StartObject() {
+        addValue(Value(TYPE_OBJECT));
+        return true;
+    }
+
+    bool EndObject() {
+        assert(!m_stack.empty());
+        assert(m_stack.back()->m_type == TYPE_OBJECT);
+        m_stack.pop_back();
+        return true;
     }
 private:
-    struct Level {
-        explicit Level(Value* value): m_value(value), m_valueCount(0) {}
-        Value* m_value;
-        int m_valueCount;
-    };
+    void addValue(Value&& value);
+
 private:
-    bool m_seeValue;
-    std::vector<Level> m_stack;
+    std::vector<Value*> m_stack;
     Value m_key;
 };
 

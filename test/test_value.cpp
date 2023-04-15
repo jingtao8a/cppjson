@@ -130,6 +130,120 @@ TEST(json_value, string_)
     TEST_STRING("\xF0\x9D\x84\x9E", "\"\\ud834\\udd1e\""); /* G clef  𝄞 */
 }
 
+TEST(json_value, array)
+{
+    cppjson::ParseError err;
+    {
+        cppjson::Document doc;
+        err = doc.parse("[]");
+        EXPECT_EQ(err, cppjson::PARSE_OK);
+        EXPECT_EQ(doc.getType(), cppjson::TYPE_ARRAY);
+        EXPECT_TRUE(doc.getArray().empty());
+    }
+    {
+        cppjson::Document doc;
+        err = doc.parse("[[]]");
+        EXPECT_EQ(err, cppjson::PARSE_OK);
+        EXPECT_EQ(doc.getType(), cppjson::TYPE_ARRAY);
+
+        auto& array = doc.getArray();
+        EXPECT_EQ(array.size(), 1);
+        EXPECT_EQ(array[0].getType(), cppjson::TYPE_ARRAY);
+        EXPECT_TRUE(array[0].getArray().empty());
+    }
+    {
+        cppjson::Document doc;
+        err = doc.parse("[0, 1, 2, 3, 4]");
+        EXPECT_EQ(err, cppjson::PARSE_OK);
+        EXPECT_EQ(doc.getType(), cppjson::TYPE_ARRAY);
+
+        auto& array = doc.getArray();
+
+        EXPECT_EQ(5, array.size());
+        for (size_t i = 0; i < array.size(); i++) {
+            EXPECT_EQ(array[i].getType(), cppjson::TYPE_INT32);
+            EXPECT_EQ(array[i].getInt32(), i);
+        }
+    }
+    {
+        cppjson::Document doc;
+        err = doc.parse("[ { } , { } , { } , { } , { } ]");
+        EXPECT_EQ(err, cppjson::PARSE_OK);
+        EXPECT_EQ(doc.getType(), cppjson::TYPE_ARRAY);
+
+        auto& array = doc.getArray();
+
+        EXPECT_EQ(5, array.size());
+        for (size_t i = 0; i < array.size(); i++) {
+            EXPECT_EQ(array[i].getType(), cppjson::TYPE_OBJECT);
+            EXPECT_EQ(array[i].getObject().size(), 0);
+        }
+    }
+    {
+        cppjson::Document doc;
+        err = doc.parse("[\"hehe\", true, false, null, 0.0]");
+        EXPECT_EQ(err, cppjson::PARSE_OK);
+        EXPECT_EQ(doc.getType(), cppjson::TYPE_ARRAY);
+
+        auto& array = doc.getArray();
+        EXPECT_EQ(5, array.size());
+        EXPECT_EQ(array[0].getType(), cppjson::TYPE_STRING);
+        EXPECT_EQ(array[1].getType(), cppjson::TYPE_BOOL);
+        EXPECT_EQ(array[2].getType(), cppjson::TYPE_BOOL);
+        EXPECT_EQ(array[3].getType(), cppjson::TYPE_NULL);
+        EXPECT_EQ(array[4].getType(), cppjson::TYPE_DOUBLE);
+
+        EXPECT_TRUE(array[0].getString() == "hehe");
+        EXPECT_EQ(array[4].getDouble(), 0.0);
+    }
+
+}
+
+TEST(json_value, object)
+{
+
+    cppjson::Document doc;
+    cppjson::ParseError err = doc.parse(" { "
+                                       "\"n\" : null , "
+                                       "\"f\" : false , "
+                                       "\"t\" : true , "
+                                       "\"i\" : 123 , "
+                                       "\"s\" : \"abc\", "
+                                        "\"a\" : [ 1, 2, 3 ],"
+                                       "\"o\" : { \"1\" : 1, \"2\" : 2, \"3\" : 3 }" 
+                                       " } ");
+
+
+    EXPECT_EQ(err, cppjson::PARSE_OK);
+    EXPECT_EQ(doc.getType(), cppjson::TYPE_OBJECT);
+
+    EXPECT_EQ(doc.getObject().size(), 7);
+    EXPECT_EQ(doc["n"].getType(), cppjson::TYPE_NULL);
+    EXPECT_EQ(doc["f"].getType(), cppjson::TYPE_BOOL);
+    EXPECT_EQ(doc["t"].getType(), cppjson::TYPE_BOOL);
+    EXPECT_EQ(doc["i"].getType(), cppjson::TYPE_INT32);
+    EXPECT_EQ(doc["s"].getType(), cppjson::TYPE_STRING);
+    EXPECT_EQ(doc["a"].getType(), cppjson::TYPE_ARRAY);
+    EXPECT_EQ(doc["o"].getType(), cppjson::TYPE_OBJECT);
+
+    EXPECT_EQ(doc["i"].getInt32(), 123);
+    EXPECT_EQ(doc["s"].getString(), "abc");
+
+    auto& array = doc["a"].getArray();
+    EXPECT_EQ(array.size(), 3);
+    for (size_t i = 0; i < 3; i++) {
+        EXPECT_EQ(array[i].getType(), cppjson::TYPE_INT32);
+        EXPECT_EQ(array[i].getInt32(), i+1);
+    }
+
+    auto& obj = doc["o"];
+    EXPECT_EQ(obj.getSize(), 3);
+    EXPECT_EQ(obj["1"].getInt32(), 1);
+    EXPECT_EQ(obj["2"].getInt32(), 2);
+    EXPECT_EQ(obj["3"].getInt32(), 3);
+}
+
+
 int main(int argc, char **argv) {
     ::testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
