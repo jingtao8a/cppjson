@@ -1,4 +1,5 @@
 #include "Reader.hpp"
+#include <cassert>
 
 namespace cppjson {
 

@@ -39,6 +39,8 @@ private:
     ParseError m_err;
 };
 
+const char* ParseErrorStr(ParseError err);
+
 }
 
 #endif

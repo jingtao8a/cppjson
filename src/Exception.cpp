@@ -9,7 +9,7 @@ static const char* tab[] = {
     #undef GEN_STRERR
 };
 
-static const char* ParseErrorStr(ParseError err) {
+const char* ParseErrorStr(ParseError err) {
     assert(err >= 0 && err < sizeof(tab) / sizeof(tab[0]));
     return tab[err];
 }

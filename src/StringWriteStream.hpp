@@ -12,8 +12,8 @@ private:
     std::vector<char> m_buffer;
 
 public:
-    void putc(char ch);
-    void puts(std::string s);
+    void put(char ch);
+    void put(std::string s);
     std::string get();
 };
 

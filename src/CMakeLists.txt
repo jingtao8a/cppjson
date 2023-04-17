@@ -7,4 +7,5 @@ add_library(cppjson STATIC
     StringWriteStream.cpp
     Value.cpp
     Reader.cpp
+    Writer.cpp
     )

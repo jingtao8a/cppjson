@@ -1,11 +1,11 @@
 #include "StringWriteStream.hpp"
 
 namespace cppjson {
-void StringWriteStream::putc(char ch) {
+void StringWriteStream::put(char ch) {
     m_buffer.push_back(ch);
 }
 
-void StringWriteStream::puts(std::string s) {
+void StringWriteStream::put(std::string s) {
     m_buffer.insert(m_buffer.end(), s.begin(), s.end());
 }
 

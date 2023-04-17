@@ -3,8 +3,6 @@
 #include "Value.hpp"
 #include "Exception.hpp"
 #include "Nocopyable.hpp"
-#include "StringReadStream.hpp"
-#include "FileReadStream.hpp"
 #include <limits>
 #include <cmath>
 #include <stdexcept>
@@ -330,10 +328,10 @@ private:
     }
 #undef CALL
 
-
-private:
+public:
     static bool isDigit(char ch) { return ch >= '0' && ch <= '9'; }
     static bool isDigit19(char ch) { return ch >= '1' && ch <= '9'; }
+private:
     static void encodeUtf8(std::string& buffer, unsigned u);
     template <typename ReadStream>
     static unsigned parseHex4(ReadStream& is) {

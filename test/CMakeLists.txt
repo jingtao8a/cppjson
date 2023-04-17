@@ -23,6 +23,11 @@ target_link_libraries(test_error gtest cppjson)
 add_executable(test_value test_value.cpp)
 target_link_libraries(test_value gtest cppjson)
 
+add_executable(test_roundrip test_roundrip.cpp)
+target_link_libraries(test_roundrip gtest cppjson)
+
+
 set(TEST_DIR ${EXECUTABLE_OUTPUT_PATH})
 add_test(test_error ${TEST_DIR}/test_error)
 add_test(test_value ${TEST_DIR}/test_value)
+add_test(test_roundrip ${TEST_DIR}/test_roundrip)
