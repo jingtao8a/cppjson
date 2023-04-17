@@ -1,5 +1,5 @@
 #include "../src/Document.hpp"
-#include "../src/Writer.hpp"
+#include "../src/PrettyWriter.hpp"
 #include "../src/FileReadStream.hpp"
 #include "../src/StringWriteStream.hpp"
 #include <stdio.h>
@@ -15,7 +15,7 @@ int main() {
     doc.parseStream(is);
 
     cppjson::StringWriteStream os;
-    cppjson::Writer<cppjson::StringWriteStream> w(os);
+    cppjson::PrettyWriter<cppjson::StringWriteStream> w(os);
     w.fromValue(doc);
 
     std::cout << os.get();

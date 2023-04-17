@@ -60,19 +60,19 @@ public:
 
 #undef CALL
 
-    bool Null() {
+    virtual bool Null() {
         prefix(TYPE_NULL);
         m_os.put("null");
         return true;
     }
 
-    bool Bool(bool b) {
+    virtual bool Bool(bool b) {
         prefix(TYPE_BOOL);
         m_os.put(b ? "true":"false");
         return true;
     }
 
-    bool Int32(int32_t i32) {
+    virtual bool Int32(int32_t i32) {
         prefix(TYPE_INT32);
         char buf[11];
         unsigned cnt = itoa(i32, buf);
@@ -80,7 +80,7 @@ public:
         return true;
     }
 
-    bool Int64(int64_t i64) {
+    virtual bool Int64(int64_t i64) {
         prefix(TYPE_INT64);
         char buf[20];
         unsigned cnt = itoa(i64, buf);
@@ -88,7 +88,7 @@ public:
         return true;
     }
 
-    bool Double(double d) {
+    virtual bool Double(double d) {
         prefix(TYPE_DOUBLE);
         char buf[32];
         if (std::isinf(d)) {
@@ -107,7 +107,7 @@ public:
         return true;
     }
 
-    bool String(std::string s) {
+    virtual bool String(std::string s) {
         prefix(TYPE_STRING);
         m_os.put('\"');
         for (auto c : s) {
@@ -135,14 +135,14 @@ public:
         return true;
     }
 
-    bool StartArray() {
+    virtual bool StartArray() {
         prefix(TYPE_ARRAY);
         m_os.put('[');
         m_stack.emplace_back(TYPE_ARRAY);
         return true;
     }
 
-    bool EndArray() {
+    virtual bool EndArray() {
         assert(!m_stack.empty());
         assert(m_stack.back().m_type == TYPE_ARRAY);
         m_stack.pop_back();
@@ -150,7 +150,7 @@ public:
         return true;
     }
 
-    bool Key(std::string s) {
+    virtual bool Key(std::string s) {
         prefix(TYPE_STRING);
         m_os.put('\"');
         m_os.put(s);
@@ -158,14 +158,14 @@ public:
         return true;
     }
 
-    bool StartObject() {
+    virtual bool StartObject() {
         prefix(TYPE_OBJECT);
         m_os.put('{');
         m_stack.emplace_back(TYPE_OBJECT);
         return true;
     }
 
-    bool EndObject() {
+    virtual bool EndObject() {
         assert(!m_stack.empty());
         assert(m_stack.back().m_type == TYPE_OBJECT);
         m_stack.pop_back();
@@ -203,8 +203,10 @@ private:
         ValueType m_type;
         int m_count;
     };
-private:
+    
+protected:
     WriterStream& m_os;
+private:
     std::vector<Node> m_stack;
 };
 
