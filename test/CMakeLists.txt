@@ -26,6 +26,8 @@ target_link_libraries(test_value gtest cppjson)
 add_executable(test_roundrip test_roundrip.cpp)
 target_link_libraries(test_roundrip gtest cppjson)
 
+add_executable(testFileWriteStream testFileWriteStream.cpp)
+target_link_libraries(testFileWriteStream gtest cppjson)
 
 set(TEST_DIR ${EXECUTABLE_OUTPUT_PATH})
 add_test(test_error ${TEST_DIR}/test_error)

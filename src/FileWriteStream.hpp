@@ -7,11 +7,11 @@
 
 namespace cppjson {
 
-class FileReadStream : public Nocopyable {
+class FileWriteStream : public Nocopyable {
 private:
     FILE *m_output;
 public:
-    explicit FileReadStream(FILE *output):m_output(output) {}
+    explicit FileWriteStream(FILE *output):m_output(output) {}
 
     void put(char c);//放入一个字符
 
