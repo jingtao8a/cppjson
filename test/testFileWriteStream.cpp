@@ -1,7 +1,7 @@
-#include "../src/Document.hpp"
-#include "../src/FileWriteStream.hpp"
-#include "../src/FileReadStream.hpp"
-#include "../src/PrettyWriter.hpp"
+#include "cppjson/Document.hpp"
+#include "cppjson/FileWriteStream.hpp"
+#include "cppjson/FileReadStream.hpp"
+#include "cppjson/PrettyWriter.hpp"
 #include <unistd.h>
 #include <stdio.h>
 

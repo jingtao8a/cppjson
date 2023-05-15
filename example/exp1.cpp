@@ -1,6 +1,6 @@
-#include "../src/Document.hpp"
-#include "../src/Writer.hpp"
-#include "../src/StringWriteStream.hpp"
+#include <cppjson/Document.hpp>
+#include <cppjson/Writer.hpp>
+#include <cppjson/StringWriteStream.hpp>
 #include <iostream>
 
 class Test {

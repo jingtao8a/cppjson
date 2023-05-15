@@ -1,4 +1,4 @@
-#include "../src/Document.hpp"
+#include "cppjson/Document.hpp"
 #include "gtest/gtest.h"
 
 

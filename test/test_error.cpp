@@ -1,22 +1,6 @@
-// #include <iostream>
-// #include <string>
-// #include "../src/Document.hpp"
-
-// int main() {
-//     // cppjson::Document doc;
-//     // doc.parse("\"\\u0000\"");
-//     // auto res = doc.getString();
-//     // std::cout << res.size();
-//     std::vector<int> vec1;
-//     std::vector<int> vec2(vec1.begin(), vec1.end());
-//     std::cout << vec2.size();
-//     return 0;
-// }
-
-
 #include <gtest/gtest.h>
 
-#include "../src/Document.hpp"
+#include "cppjson/Document.hpp"
 
 using namespace cppjson;
 
