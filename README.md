@@ -6,7 +6,7 @@
 > NULL, BOOL, INT32, DOUBLE, STRING, ARRAY, OBJECT
 > 使用union联合体存储value节省空间
 
-![img](images/1.png){width=150, height=170} ![img](images/2.png){width=180, height=170}
+<img src="images/1.png" width=150 height=170 /> <img src="images/2.png" width=180 height=170/>
 
 ## 四种自定义流(I/O)
 - FileReadStream: 文件输入流
@@ -102,3 +102,4 @@ $ make install
 ## 参考
 - [JSON tutorial](https://github.com/miloyip/json-tutorial):从零开始的JSON库教程
 - [jackson项目](https://github.com/guangqianpeng/jackson?tab=readme-ov-file): 夕阳武士（[作者知乎账号](https://www.zhihu.com/people/pen-frank-68/posts)）
+  
